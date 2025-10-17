@@ -15,14 +15,18 @@ const uri = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/stoxhub";
 const app = express();
 
 app.use(cors({
-  origin: ["http://localhost:3000"],
-  methods: ["GET","POST","PUT","DELETE"],
+  origin: "http://localhost:3000",
+  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
-app.use(express.json());
+
 app.use(cookieParser());
+app.use(express.json());
 
 // Your routes
+app.use("/", authRoute);
+
 app.get("/allHoldings", async (req,res) => {
   const allHoldings = await HoldingsModel.find({});
   res.json(allHoldings);
@@ -44,8 +48,6 @@ app.post("/newOrder", async(req,res) => {
   res.send("Order saved!");
 });
 
-app.use("/", authRoute);
-
 // Connect to DB first, then start server
 mongoose.connect(uri)
   .then(() => {
@@ -54,7 +56,15 @@ mongoose.connect(uri)
       console.log(`App started on port ${PORT}!`);
     });
   })
-  .catch(err => console.error("❌ DB connection error:", err));
+  .catch(err => console.error("❌ DB connection error:", err));
+
+
+
+
+
+
+
+
 
 
 
@@ -71,6 +81,7 @@ mongoose.connect(uri)
 // const {HoldingsModel} = require('./model/HoldingsModel');
 // const {PositionsModel} = require('./model/PositionsModel');
 // const {OrdersModel} = require('./model/OrdersModel');
+// const authRoute = require('./Routes/AuthRoute'); 
 
 
 // const PORT = process.env.PORT || 3002;
